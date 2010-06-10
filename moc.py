@@ -339,24 +339,23 @@ def get_playlist_dict(mocdir=None):
     >>> pl.get(1).get('path')
     'the absolut path to the first song'
 
-    To prevent exceptions while access non-existing
-    playlist entries do the following:
-
-    >>> pl.get(3, dict()).get('title')
-    None
+    If you try to get one non-existing entry a
+    empty PlaylistDict will be returned.
 
     """
-    #TODO write a own class to handle the 'get' method better
+    class PlaylistDict(dict):
+        def get(self, key):
+            return super(PlaylistDict, self).get(key, PlaylistDict())
 
 
     playlist = get_playlist(mocdir)
     if not playlist:
         return None
-    _playlist = dict()
+    _playlist = PlaylistDict()
     for playlist_position, title, path in playlist:
         _playlist.setdefault(
                 playlist_position,
-                {'title': title, 'path': path}
+                PlaylistDict((('title', title), ('path', path)),)
         )
     return _playlist
 
